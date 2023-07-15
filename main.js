@@ -14,7 +14,7 @@ init = function() {
 	CV = {dir:0,tt:0,val:1,delta:{x:null,y:null},pos:{x:Math.floor((SCREENWIDTH/SCALE)/2),y:Math.floor((SCREENHEIGHT/SCALE)/2)}};
 	TURNIN = 1;//add 0.5 to this but floor the value when processing
 	ctx.fillStyle = "white"
-
+	update()
 	loop();
 }
 
@@ -32,7 +32,8 @@ function onScreen(x, y)
 }
 
 myWorker.onmessage = (e) => {
-	toDraw.push([e.data[1], e.data[2]])
+	if (e.data[0]) toDraw.push([e.data[1], e.data[2]])
+	update()
 };  
 
 update = function() {
@@ -46,12 +47,12 @@ update = function() {
 		CV.delta.x=Math.cos(CV.dir)
 		CV.delta.y=-Math.sin(CV.dir)
 	}
+	//stop when a screen limit is hit
 	if (onScreen(CV.pos.x, CV.pos.y)) myWorker.postMessage([CV.val, CV.pos.x, CV.pos.y])
 }
 
 draw = function(x, y) {//make the actual pos of the CV include scale to cut multiplication time
 	var curr
-	console.log(toDraw.length)
 	while(undefined != (curr = toDraw.pop())) 
 	{
 		ctx.fillRect(curr[0]*SCALE, curr[1]*SCALE, SCALE, SCALE)
@@ -60,10 +61,7 @@ draw = function(x, y) {//make the actual pos of the CV include scale to cut mult
 
 loop = function() {
 	requestAnimationFrame(loop)
-	for (var i=0;i<1000;i++) {//draw stuff to the screen once everytime CV turns
-		update()
-		draw()
-	}
+	draw()
 }
 
 window.onload = init;

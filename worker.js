@@ -7,5 +7,6 @@ isPrime = function(n) {
 }
 
 onmessage = (e) => {
-    if (isPrime(e.data[0])) postMessage(e.data);
+    let curr = e.data[0]
+    postMessage([isPrime(curr), e.data[1], e.data[2]]);
 };
